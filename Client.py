@@ -18,4 +18,6 @@ def send(msg):
     client_socket.send(message)
     print(client_socket.recv(2048).decode(FORMAT))
     
-def encrypt(orginal_message, key):
+def encrypt(original_message, key):
+    outText = []
+    cryptText = []
