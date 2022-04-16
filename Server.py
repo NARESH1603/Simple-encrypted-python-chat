@@ -42,3 +42,45 @@ def decrypt(encrypted_message, key):
     print("[NEW CONNECTION] {0} connected".format(addr))
     connected = True
     while connected:
+        msg_length = conn.recv(HEADER).decode(FORMAT)
+        if msg_length:
+            msg_length = int(msg_length)
+            msg = conn.recv(msg_length).decode(FORMAT)
+            if msg == DISCONNECT_MESSAGE:
+                connected = False
+            elif is_int(msg) == True:
+                print("[ DECRYPTION KEY ] .... RECEIVING")
+                time.sleep(5)
+                print("[ DECRYPTION KEY ] .... RECEIVED")
+                # print("[{0}] {1}".format(addr, msg))
+                key = int(msg)
+            print(f"[ RECEIVED MESSAGED {addr}] : {str(msg)}")
+            time.sleep(5)
+            print("[ DECRYPTING MESSAGE ] ....")
+            time.sleep(5)
+            decrypted_message = ''.join(decrypt(msg, key))
+            print("[ DECRYPTED MESSAGE FROM ] {} : {}".format(addr, decrypted_message))
+            conn.send("Msg received".encode(FORMAT))
+    conn.close()
+
+def is_int(val):
+    try:
+        num = int(val)
+    except ValueError:
+        return False
+    return True
+
+def start():
+    """ Starts socket for connection """
+    server_socket.listen()
+    print("[LISTENTING] Server is listening on {}".format(SERVER))
+    time.sleep(3)
+    while True:
+        conn, addr = server_socket.accept() # returns connection information 
+        thread = threading.Thread(target=handle_client, args=(conn, addr))
+        thread.start()
+        print("[ACTIVE CONNECTION] {0}".format(threading.activeCount() -1))
+
+if __name__ == "__main__":
+    print("[*] Server is starting ....")
+    start()
